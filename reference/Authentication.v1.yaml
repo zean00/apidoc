@@ -1,0 +1,329 @@
+swagger: '2.0'
+info:
+  title: Authentication
+  version: '1.0'
+host: 'localdev:8000'
+schemes:
+  - http
+produces:
+  - application/json
+consumes:
+  - application/json
+paths:
+  /auth/otpass/otp:
+    post:
+      summary: Request OTP
+      operationId: post-auth-otpass-otp
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message
+        '500':
+          description: Internal Server Error
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message
+      description: Request SMS/Email OTP
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              userid:
+                type: string
+                description: Valid phone number or email
+            required:
+              - userid
+          x-examples:
+            example-1:
+              userid: '08562936915'
+            example-2:
+              userid: sahal.at.zain@gmail.com
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              userid:
+                type: string
+                description: Valid phone number or email
+          x-examples:
+            example-1:
+              userid: '08562936915'
+            example-2: {}
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              userid:
+                type: string
+                description: Valid phone number or email
+          x-examples:
+            example-1: {}
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              userid:
+                type: string
+                description: Valid phone number or email
+          x-examples:
+            example-1: {}
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties: {}
+      tags:
+        - auth
+        - user
+  /auth/otpass/login:
+    post:
+      summary: Authenticate With OTP + Password
+      operationId: post-auth-otpass-login
+      responses:
+        '200':
+          description: OK
+          examples:
+            example-1:
+              auth:
+                client_token: s.RvR8wkqW1ewayutQGIiOLZAK
+                accessor: 1ryp5XApj6YBxNJkyAv32wmZ
+                policies:
+                  - default
+                  - user
+                token_policies:
+                  - default
+                identity_policies:
+                  - user
+                metadata:
+                  userid: '628562936917'
+                lease_duration: 2764800
+                renewable: true
+                entity_id: 059f2a61-2f2e-10bc-d581-06dbb1851491
+                token_type: service
+                orphan: true
+          schema:
+            type: object
+            properties:
+              auth:
+                type: object
+                properties:
+                  client_token:
+                    type: string
+                    description: The only relevan response
+                required:
+                  - client_token
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                items:
+                  type: string
+          examples:
+            example-1:
+              errors:
+                - invalid password
+      description: Authenticate using Password and received OTP (SMS or Email)
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              userid:
+                type: string
+                description: Valid email or phone number
+              password:
+                type: string
+                description: 'If password is set previously, it becomes mandatory'
+              passcode:
+                type: string
+                description: Received OTP through SMS or Email
+            required:
+              - userid
+              - passcode
+          x-examples:
+            example-1:
+              userid: '08562936917'
+              passcode: '759068'
+              password: secret
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              userid:
+                type: string
+                description: Valid email or phone number
+              password:
+                type: string
+                description: 'If password is set previously, it becomes mandatory'
+              passcode:
+                type: string
+                description: Received OTP through SMS or Email
+            required:
+              - userid
+              - passcode
+          x-examples:
+            example-1: {}
+      tags:
+        - auth
+        - user
+  /auth/jwt/login:
+    post:
+      summary: Authenticate with JWT
+      operationId: post-auth-jwt-login
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              client_token:
+                type: string
+                description: The only relevan response field
+            required:
+              - client_token
+          examples:
+            example-1:
+              auth:
+                client_token: s.RvR8wkqW1ewayutQGIiOLZAK
+                accessor: 1ryp5XApj6YBxNJkyAv32wmZ
+                policies:
+                  - default
+                  - user
+                token_policies:
+                  - default
+                identity_policies:
+                  - user
+                metadata:
+                  userid: '628562936917'
+                lease_duration: 2764800
+                renewable: true
+                entity_id: 059f2a61-2f2e-10bc-d581-06dbb1851491
+                token_type: service
+                orphan: true
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                items:
+                  type: string
+          examples:
+            example-1:
+              errors:
+                - invalid password
+      description: Authenticate with JWT
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              jwt:
+                type: string
+                description: Valid JWT
+            required:
+              - jwt
+          x-examples:
+            example-1:
+              jwt: eyJhbGciOiJSUzI1NiIsImtpZCI6Ijk2YzAxNmQ0LTNlMmYtODg0NC0zOTNkLTc5NGE3NmVmM2MyZiJ9.eyJhY2NvdW50IjoiMHg5YzAwNmZiZTY3MDBhMjMzYTRmMjM1NGIyN2ZiYTNjNmZhZDljMmMyIiwiYXVkIjoidHJpZGVudGl0YXMiLCJjdXN0b21lciI6IjB4YWFhMDk1YmNmMjYwYTRlNzA4MDEyZjdlYjBhY2Q5YjUxMWI2ZjNmMiIsImV4cCI6MTU5MjI5NDY4NiwiaWF0IjoxNTkyMjA4Mjg2LCJpc3MiOiJodHRwOi8vMC4wLjAuMDo4MjAwL3YxL2lkZW50aXR5L29pZGMiLCJuYW1lc3BhY2UiOiJyb290Iiwicm9sZSI6WyJ1c2VyIl0sInN1YiI6IjA1OWYyYTYxLTJmMmUtMTBiYy1kNTgxLTA2ZGJiMTg1MTQ5MSJ9.MK4QxCwuehZLhUufNQl-o6S9aFPi0NVi9fB9Uyi2S8YN_fM9GCT-o5JWod5Y9AU0S80BQckk3mJEtZBlLCIcu5gc_q6S-hGdQNk6QtxHvt6odwKvyAprRBNRNe2WZuDogwnK_jQuxODh7lMUgMLEt1TNAmQxXoXjJchMm2nOcl7kt5GrcvqvzrPqMxC6OkeGDjhtlGgNL6BaPLl7YsVb76_qibJAORyNZo4ZkOT7LHM5CMPFDi9wO6ozE5VYrCXloL9t9tq25An2SG-A7tdI-7OiqQmis4u1wF_FGT63mYujx7OnUsPan28ox75bYtTSY3bBnS_c16H3iHEziaN5Bg
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              jwt:
+                type: string
+                description: Valid JWT
+            required:
+              - jwt
+          x-examples:
+            example-1: {}
+      tags:
+        - auth
+        - user
+  '/auth/service/login/{org}':
+    parameters:
+      - type: string
+        name: org
+        in: path
+        required: true
+        description: Organization name
+    post:
+      summary: Authenticate for Service with Token
+      operationId: post-auth-service-login-org
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                description: JWT
+            required:
+              - token
+          examples:
+            example-1:
+              token: eyJhbGciOiJSUzI1NiIsImtpZCI6ImNiNWZlZTNhLThkZWItMGY4Yy1iOWVlLTFlMzQ0MjIxMzlhYiJ9.eyJhdWQiOiJzb2x1aXgiLCJleHAiOjE1OTIyOTcwMDMsImlhdCI6MTU5MjIxMDYwMywiaXNzIjoiaHR0cDovLzAuMC4wLjA6ODIwMC92MS9pZGVudGl0eS9vaWRjIiwibmFtZXNwYWNlIjoicm9vdCIsIm9yZyI6ImN1c3RvZGlhbiIsInJvbGUiOlsiY3VzdG9kaWFuIl0sInN1YiI6IjNhZGNjMmU0LTE3NTgtOTBlMC0xYjA5LWUwNjhlMzI5NjlkYiJ9.EUAEs_X9S_FLmF0gky6O1b_iCPsQFqqr378JwPoUqtyMQ6Bk_kpulO8ieZm-Wbnqicq3BAmDwOQUNeXFjyycSXqIU0zDSQSVlV_nQ1DTd2P35O7bsK1o-De7mkTdA4agtsjVrwdTWmK5ymdnDRGYG8QwgFsmqpxYofEEji-mgmJ92PF7m_wzHq3goK5yWkDau3ABwJMoAvdc8LgefjrUEdJFGtuT7_VE1eZbu_mQDhnrW5Geuk4Utz77nj5nNmHIn588gToL0NxAWDlW2XutU-j-HvKFBAFykTNGBdNCihQLgVeXLCAkJs8qU_0x8PJv32BRGwLCJuBpyBenY-k2jQ
+        '502':
+          description: Bad Gateway
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+          examples:
+            example-1:
+              error: Error generating jwt
+      description: Authenticate service with service token
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                description: Service token
+            required:
+              - token
+          description: ''
+          x-examples:
+            example-1:
+              token: s.EsEeQqRLwvvILDsc4eWvy05R
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                description: Service token
+            required:
+              - token
+          description: ''
+          x-examples:
+            example-1: {}
+definitions: {}
